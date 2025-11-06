@@ -1,13 +1,14 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Wall : MonoBehaviour
 {
     public Transform target;
     public float moveSpeed = 2f;
-    public int health = 100;
+    public int baseHealth = 100;
+    public int health;
+    public int scoreValue = 1;
 
     [Header("Rising Settings")]
-    public float riseHeight = 3f;
     public float riseSpeed = 2f;
     public float startYOffset = -2f;
 
@@ -19,14 +20,26 @@ public class Wall : MonoBehaviour
 
     void Start()
     {
-        // ? Automatically find Rigidbody and Collider (even if on child)
-        rb = GetComponent<Rigidbody>();
-        if (rb == null)
-            rb = GetComponentInChildren<Rigidbody>();
+        // ✅ Apply difficulty-scaled health
+        if (GameManager.Instance != null)
+        {
+            health = GameManager.Instance.GetScaledWallHealth(baseHealth);
 
-        col = GetComponent<Collider>();
-        if (col == null)
-            col = GetComponentInChildren<Collider>();
+            // 🧠 Debug info on spawn
+            Debug.Log(
+                $"[WALL SPAWNED] '{name}' | Health: {health} (Base: {baseHealth}) | " +
+                $"Difficulty Multiplier: {GameManager.Instance.GetDifficultyMultiplier():F2} | " +
+                $"Spawn Interval: {GameManager.Instance.spawnInterval:F2}s"
+            );
+        }
+        else
+        {
+            health = baseHealth;
+            Debug.LogWarning($"[WALL SPAWNED] '{name}' | GameManager missing! Using base health = {baseHealth}");
+        }
+
+        rb = GetComponent<Rigidbody>() ?? GetComponentInChildren<Rigidbody>();
+        col = GetComponent<Collider>() ?? GetComponentInChildren<Collider>();
 
         if (rb != null)
         {
@@ -34,21 +47,16 @@ public class Wall : MonoBehaviour
             rb.constraints = RigidbodyConstraints.FreezeRotation;
         }
 
-        // Disable collider while rising
         if (col != null)
             col.enabled = false;
 
-        // Set positions
         finalPos = transform.position;
         startPos = new Vector3(finalPos.x, finalPos.y + startYOffset, finalPos.z);
         transform.position = startPos;
 
-        // Find player target
         GameObject playerObj = GameObject.FindWithTag("Player");
         if (playerObj != null)
-        {
             target = playerObj.transform;
-        }
     }
 
     void Update()
@@ -60,15 +68,13 @@ public class Wall : MonoBehaviour
             if (Vector3.Distance(transform.position, finalPos) < 0.01f)
             {
                 hasRisen = true;
-                if (col != null)
-                    col.enabled = true; // ? turn collider back on
+                if (col != null) col.enabled = true;
             }
             return;
         }
 
         if (target == null) return;
 
-        // Move toward player
         Vector3 direction = (target.position - transform.position).normalized;
         transform.position += direction * moveSpeed * Time.deltaTime;
         transform.LookAt(target);
@@ -77,7 +83,18 @@ public class Wall : MonoBehaviour
     public void TakeDamage(int damage)
     {
         health -= damage;
+
         if (health <= 0)
+        {
+            if (GameManager.Instance != null)
+                GameManager.Instance.AddScore(scoreValue);
+
+            Debug.Log($"[WALL DESTROYED] '{name}' | Player Score: {GameManager.Instance?.score ?? 0}");
             Destroy(gameObject);
+        }
+        else
+        {
+            Debug.Log($"[WALL HIT] '{name}' | Remaining Health: {health}");
+        }
     }
 }

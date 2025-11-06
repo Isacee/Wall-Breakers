@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 1.54, z: 0}
-  m_LocalScale: {x: -1.33, y: 2.9, z: 0.1}
+  m_LocalScale: {x: 1.33, y: 2.9, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5490333123733933744}
@@ -138,7 +138,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.189, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2.25, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4346895311357411716}
@@ -158,7 +158,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Wall
   target: {fileID: 0}
   moveSpeed: 2
+  baseHealth: 75
   health: 30
-  riseHeight: 0.025
+  scoreValue: 10
   riseSpeed: 4
   startYOffset: -2

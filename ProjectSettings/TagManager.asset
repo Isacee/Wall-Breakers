@@ -7,6 +7,7 @@ TagManager:
   - Ground
   - Bullet
   - Wall
+  - DeathZone
   layers:
   - Default
   - TransparentFX
@@ -16,8 +17,8 @@ TagManager:
   - UI
   - Bullet
   - Wall
-  - 
-  - 
+  - Player
+  - DeathZone
   - 
   - 
   - 
@@ -43,6 +44,21 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Player
+    uniqueID: 680664397
+    locked: 0
+  - name: Wall
+    uniqueID: 2690770661
+    locked: 0
+  - name: DeathZone
+    uniqueID: 3237428907
+    locked: 0
+  - name: Ground
+    uniqueID: 1416083953
+    locked: 0
+  - name: Bullet
+    uniqueID: 2831703199
     locked: 0
   m_RenderingLayers:
   - Default

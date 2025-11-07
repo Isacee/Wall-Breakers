@@ -1,40 +1,63 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class PlayerDeathHandler : MonoBehaviour
+public class DeathZone : MonoBehaviour
 {
-    [SerializeField] private YouDiedUI deathUI;
+    [Header("References")]
+    [Tooltip("Assign your Game Over Canvas here in the Inspector.")]
+    public GameObject deathUI;
 
-    private bool isDead = false;
+    private bool gameOverTriggered = false;
 
-    private void OnCollisionEnter(Collision collision)
+    void Start()
     {
-        if (isDead) return;
+        // ✅ Ensure Death UI is hidden at start
+        if (deathUI != null)
+            deathUI.SetActive(false);
+        else
+            Debug.LogWarning("⚠ Death UI not assigned in DeathZone!");
+    }
 
-        // Tag your walls as “Wall”
-        if (collision.gameObject.CompareTag("Wall"))
+    void OnTriggerEnter(Collider other)
+    {
+        // 🔒 Prevent duplicate triggers
+        if (gameOverTriggered)
+            return;
+
+        // 🎯 Detect walls by tag or layer (more robust)
+        if (other.CompareTag("Wall") || other.gameObject.layer == LayerMask.NameToLayer("Wall"))
         {
-            StartCoroutine(HandleDeath());
+            TriggerDeath();
         }
     }
 
-    private IEnumerator HandleDeath()
+    private void TriggerDeath()
     {
-        isDead = true;
+        gameOverTriggered = true;
 
-        Time.timeScale = 0f; // Stops the game
+        // 🧊 Freeze game
+        Time.timeScale = 0f;
 
-        Time.timeScale = 1f;
+        // 💀 Show death screen instantly
+        if (deathUI != null)
+            deathUI.SetActive(true);
+        else
+            Debug.LogWarning("⚠ Death UI not assigned — cannot display!");
 
-        yield return StartCoroutine(deathUI.PlayDeathSequence(() =>
+        // 🖱 Unlock cursor
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        Debug.Log("💀 Game Over triggered!");
+    }
+
+    void Update()
+    {
+        // 🖱 If player clicks anywhere, restart to Main Menu
+        if (gameOverTriggered && Input.GetMouseButtonDown(0))
         {
-            Time.timeScale = 0f;
-        }));
-
-        yield return new WaitForSecondsRealtime(0.5f);
-
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            Time.timeScale = 1f;
+            SceneManager.LoadScene(0);
+        }
     }
 }

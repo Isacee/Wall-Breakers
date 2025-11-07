@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
         score += points;
         Debug.Log($"Score: {score}");
 
-        // ✅ Check if we should increase difficulty
+        // Check if we should increase difficulty
         if (score >= difficultyLevel * scorePerLevel)
         {
             IncreaseDifficulty();
